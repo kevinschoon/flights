@@ -6,7 +6,6 @@ import (
 	"io"
 	"math"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -68,39 +67,56 @@ func parseAirport(row []string) *Airport {
 	return airport
 }
 
-func Airports() map[string]Airport {
+//2B,410,AER,2965,KZN,2990,,0,CR2
+func parseRoute(airports AirportMap, row []string) *Route {
+	if len(row) != 9 {
+		return nil
+	}
+	start, end := row[2], row[4]
+	if airports.HasCode(start) && airports.HasCode(end) {
+		if start != end {
+			return &Route{
+				to:   airports.Airport(end),
+				from: airports.Airport(start),
+			}
+		} else {
+			return nil
+		}
+	} else {
+		return nil
+	}
+}
+
+func Airports() AirportMap {
 	airports := map[string]Airport{}
-	reader := csv.NewReader(strings.NewReader(data))
+	reader := csv.NewReader(strings.NewReader(airportData))
 	reader.Comma = ':'
 	for {
 		row, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				return airports
-			}
-			panic(err)
+		if err == io.EOF {
+			return airports
 		}
 		airport := parseAirport(row)
 		if airport != nil {
 			airports[airport.Code] = *airport
 		}
 	}
-	return airports
 }
 
-func Ordered(airports map[string]Airport) []Airport {
-	var (
-		sorted []Airport
-		codes  []string
-	)
-	for key, _ := range airports {
-		codes = append(codes, key)
+func Routes(airports AirportMap) []Route {
+	var routes []Route
+	reader := csv.NewReader(strings.NewReader(routeData))
+	reader.Comma = ','
+	for {
+		row, err := reader.Read()
+		if err == io.EOF {
+			return routes
+		}
+		route := parseRoute(airports, row)
+		if route != nil {
+			routes = append(routes, *route)
+		}
 	}
-	sort.Strings(codes)
-	for _, code := range codes {
-		sorted = append(sorted, airports[code])
-	}
-	return sorted
 }
 
 func maybe(err error) {
