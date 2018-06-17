@@ -7,14 +7,6 @@ import (
 	"gonum.org/v1/gonum/graph/simple"
 )
 
-func SumWeights(route Route, weighters ...Weighter) float64 {
-	var values []float64
-	for _, weighter := range weighters {
-		values = append(values, weighter(route))
-	}
-	return floats.Sum(values)
-}
-
 // Weighter evaluates the weight of a route
 // based on some criteria
 type Weighter func(Route) float64
@@ -33,7 +25,11 @@ func Load(airports AirportMap, routes []Route, weighters ...Weighter) graph.Grap
 		g.AddNode(airport)
 	}
 	for _, route := range routes {
-		g.SetWeightedEdge(SetWeight(route, SumWeights(route, weighters...)))
+		var values []float64
+		for _, weighter := range weighters {
+			values = append(values, weighter(route))
+		}
+		g.SetWeightedEdge(SetWeight(route, floats.Sum(values)))
 	}
 	return g
 }

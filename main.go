@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	app := cli.App("flights", "✈️ ✈️ ✈️ ✈️ ✈️ ")
+	app := cli.App("flights", " ✈️  Find The Best Possible Flight ✈️  ")
 
 	app.Command("airports", "list all possible airports", func(cmd *cli.Cmd) {
 		cmd.Action = func() {
@@ -27,6 +27,37 @@ func main() {
 		}
 	})
 
+	app.Command("furthest", "show the furthest distance you can travel", func(cmd *cli.Cmd) {
+		var (
+			departureCode = cmd.StringArg("DEPARTURE", "", "starting airport")
+		)
+		cmd.Action = func() {
+			airports := Airports()
+			start := airports.Airport(*departureCode)
+			end := start
+			for _, other := range airports {
+				if GetDistance(start, other) > GetDistance(start, end) {
+					end = other
+				}
+			}
+			fmt.Println(Itinerary{weight: GetDistance(start, end), stops: []Airport{start, end}})
+		}
+	})
+
+	app.Command("nearby", "show airports nearby", func(cmd *cli.Cmd) {
+		var (
+			threshold     = cmd.IntOpt("t threshold", 500, "distance from starting airport")
+			departureCode = cmd.StringArg("DEPARTURE", "", "starting airport")
+		)
+		cmd.Action = func() {
+			airports := Airports()
+			start := airports.Airport(*departureCode)
+			for _, end := range NearBy(float64(*threshold), start, airports) {
+				fmt.Println(Itinerary{weight: GetDistance(start, end), stops: []Airport{start, end}})
+			}
+		}
+	})
+
 	app.Command("route", "find the best possible routes", func(cmd *cli.Cmd) {
 		cmd.Spec = "[OPTIONS] DEPARTURE ARRIVAL"
 		var (
@@ -36,12 +67,6 @@ func main() {
 		)
 		cmd.Action = func() {
 			airports := Airports()
-			if !airports.HasCode(*arrivalCode) {
-				maybe(fmt.Errorf("bad arrival code: %s", *arrivalCode))
-			}
-			if !airports.HasCode(*departureCode) {
-				maybe(fmt.Errorf("bad departure code: %s", *departureCode))
-			}
 			//shortest, weight := Load(airports.Airport(*departureCode), airports.Airport(*arrivalCode), opts)
 			fmt.Println(Find(
 				airports.Airport(*departureCode),

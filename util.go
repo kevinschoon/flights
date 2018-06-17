@@ -26,7 +26,7 @@ func GetDistance(start, dest Airport) float64 {
 	return Haversine([2]float64{start.Latitude, start.Longitude}, [2]float64{dest.Latitude, dest.Longitude})
 }
 
-func NearBy(threshold float64, start Airport, airports map[string]Airport) []Airport {
+func NearBy(threshold float64, start Airport, airports AirportMap) []Airport {
 	nearby := []Airport{}
 	for _, dest := range airports {
 		if GetDistance(start, dest) <= threshold {
