@@ -1,6 +1,6 @@
 # ✈️  Flights ✈️ 
 
-`flights` is a program that helps you _Find The Best Possible Flight_.
+`flights` is a program that helps you _Find The Best Possible Flight_ ©.
 
 
 ## Usage
@@ -24,6 +24,8 @@ Commands:
 List all known airports
 
 #### Example
+
+### airports
 
 ```
 $ flights airports
