@@ -36,7 +36,7 @@ func Load(airports AirportMap, routes []Route, weighters ...Weighter) graph.Grap
 
 func Find(start, end Airport, g graph.Graph) Itinerary {
 	shortest := path.DijkstraFrom(start, g)
-	path, weight := shortest.To(end)
+	path, weight := shortest.To(end.ID())
 	var airports []Airport
 	for _, p := range path {
 		airports = append(airports, p.(Airport))
