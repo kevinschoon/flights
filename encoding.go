@@ -28,7 +28,7 @@ type dotEncoder struct {
 }
 
 func (d dotEncoder) Encode(w io.Writer) error {
-	raw, err := dot.Marshal(d.graph, "", "", "", false)
+	raw, err := dot.Marshal(d.graph, "", "", "")
 	if err != nil {
 		return err
 	}

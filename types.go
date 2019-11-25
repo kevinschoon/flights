@@ -64,6 +64,8 @@ func (a Airport) ID() int64 {
 	return int64(h.Sum64())
 }
 
+var _ graph.WeightedEdge = (*Route)(nil)
+
 type Route struct {
 	to     Airport
 	from   Airport
@@ -74,9 +76,10 @@ func (r Route) String() string {
 	return fmt.Sprintf("%s->%s", r.from, r.to)
 }
 
-func (r Route) To() graph.Node   { return r.to }
-func (r Route) From() graph.Node { return r.from }
-func (r Route) Weight() float64  { return r.weight }
+func (r Route) To() graph.Node           { return r.to }
+func (r Route) From() graph.Node         { return r.from }
+func (r Route) Weight() float64          { return r.weight }
+func (r Route) ReversedEdge() graph.Edge { return Route{to: r.from, from: r.to, weight: r.weight} }
 
 func SetWeight(r Route, weight float64) Route {
 	return Route{to: r.to, from: r.from, weight: weight}
